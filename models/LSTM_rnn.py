@@ -39,9 +39,9 @@ class LSTM(nn.Module):
     def forward(self, inp):
         hidden, cell = self.initHidden(), self.initHidden()
         outputs = []
-        for time_step in range(inp.size(1)):
-            rnn_out, hidden = self.hidden_layer(inp, (hidden, cell))
-            outputs.append(self.output_layer(rnn_out[:, time_step, :]))
+        for i in range(inp.size(1)):
+            rnn_out, hidden = self.hidden_layer(inp[:, i:i+1, :], (hidden, cell))
+            outputs.append(self.output_layer(rnn_out.squeeze()))
             hidden, cell = hidden[0], hidden[1]
         return torch.stack(outputs, dim=1), hidden
 

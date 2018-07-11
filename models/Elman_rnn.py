@@ -39,9 +39,9 @@ class RNN(nn.Module):
     def forward(self, inp):
         hidden = self.initHidden()
         outputs = []
-        for time_step in range(inp.size(1)):
-            rnn_out, hidden = self.hidden_layer(inp, hidden)
-            outputs.append(self.output_layer(rnn_out[:, time_step, :]))
+        for i in range(inp.size(1)):
+            rnn_out, hidden = self.hidden_layer(inp[:, i:i+1, :], hidden)
+            outputs.append(self.output_layer(rnn_out.squeeze()))
 
         return torch.stack(outputs, dim=1), hidden
 
