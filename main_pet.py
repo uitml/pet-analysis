@@ -163,7 +163,7 @@ s2 = pandas.Series([model_selector_gru.final_epoch, gru_loss[-patience-1][0],
                     gru_time])
 s3 = pandas.Series([model_selector_lstm.final_epoch, lstm_loss[-patience-1][0],
                     lstm_loss[-patience-1][1], lstm_loss[-patience-1][2],
-                    gru_time])
+                    lstm_time])
 
 print(pandas.DataFrame([list(s1), list(s2), list(s3)],
                        index=['RNN', 'GRU', 'LSTM'],
