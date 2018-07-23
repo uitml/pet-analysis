@@ -45,13 +45,13 @@ if args.data_split == 2:
 print('Data loading complete')
 
 if args.cuda:
-    rnn = RNN(n_inputs, n_hidden, n_outputs, n_layers, batch_size, bidirectional).cuda()
-    gru = GRU(n_inputs, n_hidden, n_outputs, n_layers, batch_size, bidirectional).cuda()
-    lstm = LSTM(n_inputs, n_hidden, n_outputs, n_layers, batch_size, bidirectional).cuda()
+    rnn = RNN(n_inputs, n_hidden, n_outputs, n_layers, batch_size, bidirectional, args.cuda).cuda()
+    gru = GRU(n_inputs, n_hidden, n_outputs, n_layers, batch_size, bidirectional, args.cuda).cuda()
+    lstm = LSTM(n_inputs, n_hidden, n_outputs, n_layers, batch_size, bidirectional, args.cuda).cuda()
 else:
-    rnn = RNN(n_inputs, n_hidden, n_outputs, n_layers, batch_size, bidirectional)
-    gru = GRU(n_inputs, n_hidden, n_outputs, n_layers, batch_size, bidirectional)
-    lstm = LSTM(n_inputs, n_hidden, n_outputs, n_layers, batch_size, bidirectional)
+    rnn = RNN(n_inputs, n_hidden, n_outputs, n_layers, batch_size, bidirectional, args.cuda)
+    gru = GRU(n_inputs, n_hidden, n_outputs, n_layers, batch_size, bidirectional, args.cuda)
+    lstm = LSTM(n_inputs, n_hidden, n_outputs, n_layers, batch_size, bidirectional, args.cuda)
 
 optimizer_rnn = torch.optim.Adam(rnn.parameters())
 optimizer_gru = torch.optim.Adam(gru.parameters())

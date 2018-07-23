@@ -11,9 +11,11 @@ class GRU(nn.Module):
                  output_size,
                  n_layers,
                  batch_size,
-                 bidirectional):
+                 bidirectional,
+                 cuda):
         super(GRU, self).__init__()
 
+        self.cuda = cuda
         self.n_layers = n_layers
         self.batch_size = batch_size
         self.hidden_size = hidden_size
@@ -37,7 +39,11 @@ class GRU(nn.Module):
             self.output_layer = nn.Linear(hidden_size, output_size)
 
     def forward(self, inp):
-        hidden = self.initHidden()
+
+        if self.cuda:
+            hidden = self.initHidden().cuda()
+        else:
+            hidden = self.initHidden()
         outputs = []
         for i in range(inp.size(1)):
             rnn_out, hidden = self.hidden_layer(inp[:, i:i+1, :], hidden)
