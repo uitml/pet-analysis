@@ -12,10 +12,10 @@ class LSTM(nn.Module):
                  n_layers,
                  batch_size,
                  bidirectional,
-                 cuda):
+                 use_cuda):
         super(LSTM, self).__init__()
 
-        self.cuda = cuda
+        self.use_cuda = use_cuda
         self.n_layers = n_layers
         self.batch_size = batch_size
         self.hidden_size = hidden_size
@@ -40,7 +40,7 @@ class LSTM(nn.Module):
 
     def forward(self, inp):
 
-        if self.cuda:
+        if self.use_cuda:
             hidden, cell = self.initHidden().cuda(), self.initHidden().cuda()
         else:
             hidden, cell = self.initHidden(), self.initHidden()
