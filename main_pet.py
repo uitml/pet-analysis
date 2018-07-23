@@ -13,7 +13,7 @@ from PET_graph_loader import proper_split,  proper_split_LV
 n_layers = 2
 n_hidden = 10
 n_outputs = 1
-patience = 30
+patience = 50
 n_epochs = 0
 rnn_loss = []
 gru_loss = []
