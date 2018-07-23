@@ -29,7 +29,7 @@ def train(x, y, batch_size, optimizer, criterion, model, cuda):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-        batch_cost.append(loss.data.numpy())
+        batch_cost.append(loss.cpu().data.numpy())
 
     return np.mean(batch_cost)
 
@@ -52,7 +52,7 @@ def validate(x, y, batch_size, criterion, model, cuda):
 
         output, state = model(x_va[i*batch_size:(i+1)*batch_size])
         loss = criterion(output, y_va[i*batch_size:(i+1)*batch_size])
-        batch_cost.append(loss.data.numpy())
+        batch_cost.append(loss.cpu().data.numpy())
 
     return np.mean(batch_cost)
 
@@ -75,7 +75,7 @@ def test(x, y, batch_size, criterion, model, cuda):
 
         output, state = model(x_va[i*batch_size:(i+1)*batch_size])
         loss = criterion(output, y_va[i*batch_size:(i+1)*batch_size])
-        batch_cost.append(loss.data.numpy())
+        batch_cost.append(loss.cpu().data.numpy())
 
     return np.mean(batch_cost)
 
