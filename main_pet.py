@@ -13,7 +13,7 @@ from PET_graph_loader import proper_split,  proper_split_LV
 n_layers = 2
 n_hidden = 10
 n_outputs = 1
-patience = 1
+patience = 30
 n_epochs = 0
 rnn_loss = []
 gru_loss = []
@@ -30,17 +30,16 @@ parser.add_argument("file")
 parser.add_argument("data_split")
 parser.add_argument('--cuda', action='store_true', default=False)
 
-
 args = parser.parse_args()
 
-if args.data_splot == 0:
-    x_tr, y_tr, x_va, y_va, x_te, y_te = proper_split(parser.file)
+if args.data_split == 'VC':
+    x_tr, y_tr, x_va, y_va, x_te, y_te = proper_split(args.file)
     n_inputs = 11
-if args.data_splot == 1:
-    x_tr, y_tr, x_va, y_va, x_te, y_te = proper_split_LV(parser.file)
+if args.data_split == 'LV':
+    x_tr, y_tr, x_va, y_va, x_te, y_te = proper_split_LV(args.file)
     n_inputs = 10
-if args.data_splot == 2:
-    x_tr, y_tr, x_va, y_va, x_te, y_te = proper_split(parser.file)
+if args.data_split == 2:
+    x_tr, y_tr, x_va, y_va, x_te, y_te = proper_split(args.file)
 
 
 print('Data loading complete')
@@ -72,19 +71,19 @@ while(model_selector_rnn.keep_training or
                                optimizer_rnn,
                                criterion,
                                rnn,
-                               False),
+                               args.cuda),
                         validate(x_va,
                                  y_va,
                                  batch_size,
                                  criterion,
                                  rnn,
-                                 False),
+                                 args.cuda),
                         test(x_te,
                              y_te,
                              batch_size,
                              criterion,
                              rnn,
-                             False)])
+                             args.cuda)])
 
         rnn_time = str(datetime.datetime.now()-time_start)
         model_selector_rnn.update(rnn_loss[-1][1], n_epochs)
@@ -96,22 +95,22 @@ while(model_selector_rnn.keep_training or
                                optimizer_gru,
                                criterion,
                                gru,
-                               False),
+                               args.cuda),
                         validate(x_va,
                                  y_va,
                                  batch_size,
                                  criterion,
                                  gru,
-                                 False),
+                                 args.cuda),
                         test(x_te,
                              y_te,
                              batch_size,
                              criterion,
                              gru,
-                             False)])
+                             args.cuda)])
 
         gru_time = str(datetime.datetime.now()-time_start)
-        model_selector_rnn.update(gru_loss[-1][1], n_epochs)
+        model_selector_gru.update(gru_loss[-1][1], n_epochs)
 
     if model_selector_lstm.keep_training:
         lstm_loss.append([train(x_tr,
@@ -120,19 +119,19 @@ while(model_selector_rnn.keep_training or
                                 optimizer_lstm,
                                 criterion,
                                 lstm,
-                                False),
+                                args.cuda),
                          validate(x_va,
                                   y_va,
                                   batch_size,
                                   criterion,
                                   lstm,
-                                  False),
+                                  args.cuda),
                          test(x_te,
                               y_te,
                               batch_size,
                               criterion,
                               lstm,
-                              False)])
+                              args.cuda)])
 
         lstm_time = str(datetime.datetime.now()-time_start)
         model_selector_lstm.update(lstm_loss[-1][1], n_epochs)
