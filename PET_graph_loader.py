@@ -48,7 +48,7 @@ def leave_one_out(path):
             np.asarray(y_te, dtype=np.float32))
 
 
-def proper_split(path):
+def proper_split_VC(path):
 
     # Function which splits data into training, validation and test set.
     # We use 60% of the data for training and 20% for validation and testing.
@@ -79,10 +79,11 @@ def proper_split(path):
             np.asarray(x_va, dtype=np.float32),
             np.asarray(y_va, dtype=np.float32),
             np.asarray(x_te, dtype=np.float32),
-            np.asarray(y_te, dtype=np.float32))
+            np.asarray(y_te, dtype=np.float32),
+            idx)
 
 
-def proper_split_LV(path):
+def proper_split_VCLV(path):
 
     # Function which splits data into training, validation and test set.
     # We use 60% of the data for training and 20% for validation and testing.
@@ -117,4 +118,44 @@ def proper_split_LV(path):
             np.asarray(x_va, dtype=np.float32),
             np.asarray(y_va, dtype=np.float32),
             np.asarray(x_te, dtype=np.float32),
-            np.asarray(y_te, dtype=np.float32))
+            np.asarray(y_te, dtype=np.float32),
+            idx)
+
+
+def proper_split_VCnormLV(path):
+
+    # Function which splits data into training, validation and test set.
+    # We use 60% of the data for training and 20% for validation and testing.
+
+    data = data_loader(path)                        # Import data.
+    Y = Y_loader(path)[0, 2]
+    idx = np.random.permutation(data.shape[-1])     # Index for data shuffling.
+    print('Splitting data into 44 training mice,'
+          '\n 12 validation mice and 12 test mice.')
+
+    # Extract training, validation and test data/labels.
+    x_tr = np.concatenate((data[:, 4, 1:2, idx[0:44]],
+                           data[:, 4, 3:, idx[0:44]]), 2)
+    y_tr = Y[:, 1, idx[0:44]]
+    y_tr = np.transpose(y_tr.reshape(y_tr.shape[0],
+                                     y_tr.shape[1], 1), (1, 0, 2))
+
+    x_va = np.concatenate((data[:, 4, 1:2, idx[44:56]],
+                           data[:, 4, 3:, idx[44:56]]), 2)
+    y_va = Y[:, 1, idx[44:56]]
+    y_va = np.transpose(y_va.reshape(y_va.shape[0],
+                                     y_va.shape[1], 1), (1, 0, 2))
+
+    x_te = np.concatenate((data[:, 4, 1:2, idx[56:68]],
+                           data[:, 4, 3:, idx[56:68]]), 2)
+    y_te = Y[:, 1, idx[56:68]]
+    y_te = np.transpose(y_te.reshape(y_te.shape[0],
+                                     y_te.shape[1], 1), (1, 0, 2))
+
+    return (np.asarray(x_tr, dtype=np.float32),
+            np.asarray(y_tr, dtype=np.float32),
+            np.asarray(x_va, dtype=np.float32),
+            np.asarray(y_va, dtype=np.float32),
+            np.asarray(x_te, dtype=np.float32),
+            np.asarray(y_te, dtype=np.float32),
+            idx)

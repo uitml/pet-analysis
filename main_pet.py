@@ -7,8 +7,10 @@ import torch.nn as nn
 from GRU_rnn import GRU
 from Elman_rnn import RNN
 from LSTM_rnn import LSTM
+from PET_graph_loader import proper_split_VC
+from PET_graph_loader import proper_split_VCLV
+from PET_graph_loader import proper_split_VCnormLV
 from utility import train, validate, test, Early_Stopper
-from PET_graph_loader import proper_split,  proper_split_LV
 
 n_layers = 2
 n_hidden = 20
@@ -30,17 +32,16 @@ for i in range(3):
     print('Random suffle: ', i)
 
     if args.data_split == 'VC':
-        x_tr, y_tr, x_va, y_va, x_te, y_te = proper_split(args.file)
+        x_tr, y_tr, x_va, y_va, x_te, y_te = proper_split_VC(args.file)
         n_inputs = 11
     if args.data_split == 'LV':
-        x_tr, y_tr, x_va, y_va, x_te, y_te = proper_split_LV(args.file)
+        x_tr, y_tr, x_va, y_va, x_te, y_te = proper_split_VCLV(args.file)
         n_inputs = 10
     if args.data_split == 2:
-        x_tr, y_tr, x_va, y_va, x_te, y_te = proper_split(args.file)
-    
-    
+        x_tr, y_tr, x_va, y_va, x_te, y_te = proper_split_VCnormLV(args.file)
+
     print('Data loading complete')
-    
+
     if args.cuda:
         rnn = RNN(n_inputs, n_hidden, n_outputs,
                   n_layers, batch_size, bidirectional, args.cuda).cuda()
