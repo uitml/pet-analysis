@@ -32,7 +32,7 @@ parser.add_argument('--cuda', action='store_true', default=False)
 
 args = parser.parse_args()
 
-for i in range(3):
+for i in range(1000):
 
     print('Random suffle: ', i)
 
@@ -157,11 +157,11 @@ for i in range(3):
         n_epochs += 1
 
         s1 = pandas.Series([n_epochs, rnn_loss[-1][0], rnn_loss[-1][1],
-                            rnn_loss[-1][2], rnn_time])
+                            rnn_loss[-1][2], rnn_time, i])
         s2 = pandas.Series([n_epochs, gru_loss[-1][0], gru_loss[-1][1],
-                            gru_loss[-1][2], gru_time])
+                            gru_loss[-1][2], gru_time, i])
         s3 = pandas.Series([n_epochs, lstm_loss[-1][0], lstm_loss[-1][1],
-                            lstm_loss[-1][2], lstm_time])
+                            lstm_loss[-1][2], lstm_time, i])
 
         print(pandas.DataFrame([list(s1), list(s2), list(s3)],
                                index=['RNN', 'GRU', 'LSTM'],
@@ -169,22 +169,23 @@ for i in range(3):
                                         'Training',
                                         'Validation',
                                         'Test',
-                                        'Elapsed time']))
+                                        'Elapsed time',
+                                        'Model run']))
 
     print('Training ended')
 
     rnn_results = [model_selector_rnn.final_epoch,
                    rnn_time,
                    rnn_loss,
-                   rnn.pred(Variable(torch.from_numpy(x_te)))]
+                   rnn.pred(Variable(torch.from_numpy(x_te))).data.numpy()]
     gru_results = [model_selector_gru.final_epoch,
                    gru_time,
                    gru_loss,
-                   gru.pred(Variable(torch.from_numpy(x_te)))]
+                   gru.pred(Variable(torch.from_numpy(x_te))).data.numpy()]
     lstm_results = [model_selector_lstm.final_epoch,
                     lstm_time,
                     lstm_loss,
-                    lstm.pred(Variable(torch.from_numpy(x_te)))]
+                    lstm.pred(Variable(torch.from_numpy(x_te))).data.numpy()]
 
     PET_results.append([rnn_results, gru_results, lstm_results, idx])
 
