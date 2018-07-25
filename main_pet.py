@@ -3,25 +3,30 @@ import torch
 import pandas
 import datetime
 import argparse
+import numpy as np
 import torch.nn as nn
 from GRU_rnn import GRU
 from Elman_rnn import RNN
 from LSTM_rnn import LSTM
+from torch.autograd import Variable
 from PET_graph_loader import proper_split_VC
 from PET_graph_loader import proper_split_VCLV
 from PET_graph_loader import proper_split_VCnormLV
 from utility import train, validate, test, Early_Stopper
 
 n_layers = 2
-n_hidden = 20
+n_hidden = 30
 n_outputs = 1
 patience = 50
 batch_size = 12
 bidirectional = False
 criterion = nn.MSELoss()
 
+PET_results = []
+
 parser = argparse.ArgumentParser()
 parser.add_argument("file")
+parser.add_argument("save_file")
 parser.add_argument("data_split")
 parser.add_argument('--cuda', action='store_true', default=False)
 
@@ -32,13 +37,13 @@ for i in range(3):
     print('Random suffle: ', i)
 
     if args.data_split == 'VC':
-        x_tr, y_tr, x_va, y_va, x_te, y_te = proper_split_VC(args.file)
+        x_tr, y_tr, x_va, y_va, x_te, y_te, idx = proper_split_VC(args.file)
         n_inputs = 11
     if args.data_split == 'LV':
-        x_tr, y_tr, x_va, y_va, x_te, y_te = proper_split_VCLV(args.file)
+        x_tr, y_tr, x_va, y_va, x_te, y_te, idx = proper_split_VCLV(args.file)
         n_inputs = 10
-    if args.data_split == 2:
-        x_tr, y_tr, x_va, y_va, x_te, y_te = proper_split_VCnormLV(args.file)
+    if args.data_split == 'VCnormLV':
+        x_tr, y_tr, x_va, y_va, x_te, y_te, idx = proper_split_VCnormLV(args.file)
 
     print('Data loading complete')
 
@@ -168,21 +173,19 @@ for i in range(3):
 
     print('Training ended')
 
-    s1 = pandas.Series([model_selector_rnn.final_epoch,
-                        rnn_loss[-patience-1][0], rnn_loss[-patience-1][1],
-                        rnn_loss[-patience-1][2], rnn_time])
-    s2 = pandas.Series([model_selector_gru.final_epoch,
-                        gru_loss[-patience-1][0], gru_loss[-patience-1][1],
-                        gru_loss[-patience-1][2], gru_time])
-    s3 = pandas.Series([model_selector_lstm.final_epoch,
-                        lstm_loss[-patience-1][0], lstm_loss[-patience-1][1],
-                        lstm_loss[-patience-1][2],
-                        lstm_time])
+    rnn_results = [model_selector_rnn.final_epoch,
+                   rnn_time,
+                   rnn_loss,
+                   rnn.pred(Variable(torch.from_numpy(x_te)))]
+    gru_results = [model_selector_gru.final_epoch,
+                   gru_time,
+                   gru_loss,
+                   gru.pred(Variable(torch.from_numpy(x_te)))]
+    lstm_results = [model_selector_lstm.final_epoch,
+                    lstm_time,
+                    lstm_loss,
+                    lstm.pred(Variable(torch.from_numpy(x_te)))]
 
-    print(pandas.DataFrame([list(s1), list(s2), list(s3)],
-                           index=['RNN', 'GRU', 'LSTM'],
-                           columns=['Final Epoch',
-                                    'Training',
-                                    'Validation',
-                                    'Test',
-                                    'Elapsed time']))
+    PET_results.append([rnn_results, gru_results, lstm_results, idx])
+
+np.savez_compressed(args.save_file, a=PET_results)
