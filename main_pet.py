@@ -17,7 +17,7 @@ from utility import train, validate, test, Early_Stopper
 n_layers = 2
 n_hidden = 30
 n_outputs = 1
-patience = 50
+patience = 100
 batch_size = 12
 bidirectional = False
 criterion = nn.MSELoss()
@@ -32,7 +32,7 @@ parser.add_argument('--cuda', action='store_true', default=False)
 
 args = parser.parse_args()
 
-for i in range(2):
+for i in range(1000):
 
     print('Random suffle: ', i)
 
