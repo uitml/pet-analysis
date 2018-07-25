@@ -32,7 +32,7 @@ parser.add_argument('--cuda', action='store_true', default=False)
 
 args = parser.parse_args()
 
-for i in range(1000):
+for i in range(2):
 
     print('Random suffle: ', i)
 
