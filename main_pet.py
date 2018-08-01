@@ -15,9 +15,9 @@ from PET_graph_loader import proper_split_VCnormLV
 from utility import train, validate, test, Early_Stopper
 
 n_layers = 2
-n_hidden = 30
+n_hidden = 20
 n_outputs = 1
-patience = 100
+patience = 50
 batch_size = 12
 bidirectional = False
 criterion = nn.MSELoss()
@@ -78,57 +78,55 @@ for i in range(1000):
     time_start = datetime.datetime.now()
     print('Training started at:', time_start)
 
-    while(model_selector_rnn.keep_training or
-          model_selector_gru.keep_training or
-          model_selector_lstm.keep_training):
+    while(model_selector_lstm.keep_training):
 
-        if model_selector_rnn.keep_training:
-            rnn_loss.append([train(x_tr,
-                                   y_tr,
-                                   batch_size,
-                                   optimizer_rnn,
-                                   criterion,
-                                   rnn,
-                                   args.cuda),
-                            validate(x_va,
-                                     y_va,
-                                     batch_size,
-                                     criterion,
-                                     rnn,
-                                     args.cuda),
-                            test(x_te,
-                                 y_te,
-                                 batch_size,
-                                 criterion,
-                                 rnn,
-                                 args.cuda)])
-    
-            rnn_time = str(datetime.datetime.now()-time_start)
-            model_selector_rnn.update(rnn_loss[-1][1], n_epochs)
-    
-        if model_selector_gru.keep_training:
-            gru_loss.append([train(x_tr,
-                                   y_tr,
-                                   batch_size,
-                                   optimizer_gru,
-                                   criterion,
-                                   gru,
-                                   args.cuda),
-                            validate(x_va,
-                                     y_va,
-                                     batch_size,
-                                     criterion,
-                                     gru,
-                                     args.cuda),
-                            test(x_te,
-                                 y_te,
-                                 batch_size,
-                                 criterion,
-                                 gru,
-                                 args.cuda)])
-    
-            gru_time = str(datetime.datetime.now()-time_start)
-            model_selector_gru.update(gru_loss[-1][1], n_epochs)
+#        if model_selector_rnn.keep_training:
+#            rnn_loss.append([train(x_tr,
+#                                   y_tr,
+#                                   batch_size,
+#                                   optimizer_rnn,
+#                                   criterion,
+#                                   rnn,
+#                                   args.cuda),
+#                            validate(x_va,
+#                                     y_va,
+#                                     batch_size,
+#                                     criterion,
+#                                     rnn,
+#                                     args.cuda),
+#                            test(x_te,
+#                                 y_te,
+#                                 batch_size,
+#                                 criterion,
+#                                 rnn,
+#                                 args.cuda)])
+#    
+#            rnn_time = str(datetime.datetime.now()-time_start)
+#            model_selector_rnn.update(rnn_loss[-1][1], n_epochs)
+#    
+#        if model_selector_gru.keep_training:
+#            gru_loss.append([train(x_tr,
+#                                   y_tr,
+#                                   batch_size,
+#                                   optimizer_gru,
+#                                   criterion,
+#                                   gru,
+#                                   args.cuda),
+#                            validate(x_va,
+#                                     y_va,
+#                                     batch_size,
+#                                     criterion,
+#                                     gru,
+#                                     args.cuda),
+#                            test(x_te,
+#                                 y_te,
+#                                 batch_size,
+#                                 criterion,
+#                                 gru,
+#                                 args.cuda)])
+#    
+#            gru_time = str(datetime.datetime.now()-time_start)
+#            model_selector_gru.update(gru_loss[-1][1], n_epochs)
     
         if model_selector_lstm.keep_training:
             lstm_loss.append([train(x_tr,
@@ -156,15 +154,15 @@ for i in range(1000):
 
         n_epochs += 1
 
-        s1 = pandas.Series([n_epochs, rnn_loss[-1][0], rnn_loss[-1][1],
-                            rnn_loss[-1][2], rnn_time, i])
-        s2 = pandas.Series([n_epochs, gru_loss[-1][0], gru_loss[-1][1],
-                            gru_loss[-1][2], gru_time, i])
+#        s1 = pandas.Series([n_epochs, rnn_loss[-1][0], rnn_loss[-1][1],
+#                            rnn_loss[-1][2], rnn_time, i])
+#        s2 = pandas.Series([n_epochs, gru_loss[-1][0], gru_loss[-1][1],
+#                            gru_loss[-1][2], gru_time, i])
         s3 = pandas.Series([n_epochs, lstm_loss[-1][0], lstm_loss[-1][1],
                             lstm_loss[-1][2], lstm_time, i])
 
-        print(pandas.DataFrame([list(s1), list(s2), list(s3)],
-                               index=['RNN', 'GRU', 'LSTM'],
+        print(pandas.DataFrame([list(s3)],
+                               index=['LSTM'],
                                columns=['Epoch',
                                         'Training',
                                         'Validation',
@@ -174,19 +172,19 @@ for i in range(1000):
 
     print('Training ended')
 
-    rnn_results = [model_selector_rnn.final_epoch,
-                   rnn_time,
-                   rnn_loss,
-                   rnn.pred(Variable(torch.from_numpy(x_te))).data.numpy()]
-    gru_results = [model_selector_gru.final_epoch,
-                   gru_time,
-                   gru_loss,
-                   gru.pred(Variable(torch.from_numpy(x_te))).data.numpy()]
+#    rnn_results = [model_selector_rnn.final_epoch,
+#                   rnn_time,
+#                   rnn_loss,
+#                   rnn.pred(Variable(torch.from_numpy(x_te))).data.numpy()]
+#    gru_results = [model_selector_gru.final_epoch,
+#                   gru_time,
+#                   gru_loss,
+#                   gru.pred(Variable(torch.from_numpy(x_te))).data.numpy()]
     lstm_results = [model_selector_lstm.final_epoch,
                     lstm_time,
                     lstm_loss,
                     lstm.pred(Variable(torch.from_numpy(x_te))).data.numpy()]
 
-    PET_results.append([rnn_results, gru_results, lstm_results, idx])
+    PET_results.append([lstm_results, idx])
 
 np.savez_compressed(args.save_file, a=PET_results)
