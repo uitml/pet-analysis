@@ -14,7 +14,7 @@ from PET_graph_loader import proper_split_VCLV
 from PET_graph_loader import proper_split_VCnormLV
 from utility import train, validate, test, Early_Stopper
 
-n_layers = 2
+n_layers = 1
 n_hidden = 20
 n_outputs = 1
 patience = 50
